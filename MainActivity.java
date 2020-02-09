@@ -1,75 +1,84 @@
 package com.cookandroid.myapplication;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-
-// 먼저 투표하는 코드
-// 투표 수 저장한 배열과 파일명 저장한 배열 ResultActivity에 넘겨줌
+// 영화 포스터를 클릭하면 나오는 대화상자의 제목 창에
+// 영화 제목이 보이도록 하는 코드 예제.
 public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTitle("명화 투표");
+        setTitle("영화 포스터");
+
+        final GridView gv = (GridView) findViewById(R.id.gridView1);
+        MyGridAdapter gAdapter = new MyGridAdapter(this);
+        gv.setAdapter(gAdapter);
 
 
-        final int voteCount[] = new int[9];
-        for (int i = 0; i < 9; i++) {
-            voteCount[i] = 0;
-        }
-
-        ImageView image[] = new ImageView[9];
-        Integer imageId[] = {R.id.iv1, R.id.iv2, R.id.iv3, R.id.iv4, R.id.iv5, R.id.iv6, R.id.iv7, R.id.iv8, R.id.iv9};
-        //final Integer imageFileId[] = {R.drawable.renoir1, R.drawable.renoir2, R.drawable.renoir3, R.drawable.renoir4,R.drawable.renoir5, R.drawable.renoir6,
-        //R.drawable.renoir7, R.drawable.renoir8, R.drawable.renoir9}; -> Integer 배열로 넘기면 값 안 넘겨짐!
-        final ArrayList<Integer> imageFileId = new ArrayList<Integer>(); // ArryList로 넘거야함!
-        imageFileId.add(R.drawable.renoir1);
-        imageFileId.add(R.drawable.renoir2); // 파일 이름들 추가.
-        imageFileId.add(R.drawable.renoir3);
-        imageFileId.add(R.drawable.renoir4);
-        imageFileId.add(R.drawable.renoir5);
-        imageFileId.add(R.drawable.renoir6);
-        imageFileId.add(R.drawable.renoir7);
-        imageFileId.add(R.drawable.renoir8);
-        imageFileId.add(R.drawable.renoir9);
-
-        final String imgName[] = {"도시의 무도회", "푸르네즈에서의 점심 식사", "물뿌리개를 든 소녀",
-                "뱃놀이 일행의 오찬", "아르장퇴유의 정원에서", "작은 배", "잔 사마리의 초상",
-                "해변에서", "호숫가 근처 물가에서"};
-
-        for (int i = 0; i < imageId.length; i++) {
-            final int index; // **주의!! 꼭 필요함!!**
-            index = i;
-            image[index] = (ImageView) findViewById(imageId[index]); // 각각 매칭
-            image[index].setOnClickListener(new View.OnClickListener() { // 배열 이용해 클릭 리스너 작성
-                @Override
-                public void onClick(View view) {
-                    voteCount[index]++; // 클릭할 때마다 투표수 증가
-                    Toast.makeText(getApplicationContext(), imgName[index] + " : 총 " + voteCount[index] + " 표", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        Button btnResult = (Button) findViewById(R.id.btnResult);
-        btnResult.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
-                intent.putExtra("VoteCount", voteCount); // 정수형 배열 voteCount를 VoteCount라는 이름으로 넘긴다 -> getIntArrayExtra()
-                //intent.putExtra("ImageName", imgName); // -> getStringArrayExtra()
-                intent.putIntegerArrayListExtra("FileName", imageFileId); // ***Integer는 이렇게 넘겨야 함!!!
-                startActivity(intent);
-            }
-        });
     }
 
+    public class MyGridAdapter extends BaseAdapter {
+        Context context;
+
+        public MyGridAdapter(Context c) {
+            context = c;
+        }
+
+        public int getCount() {
+            return posterID.length; // 그리드에 보일 이미지의 개수 반환
+        }
+
+        public Object getItem(int arg0) {
+            return null;
+        }
+
+        public long getItemId(int arg0) {
+            return 0;
+        }
+
+        Integer[] posterID = {
+                R.drawable.mov01, R.drawable.mov02, R.drawable.mov03, R.drawable.mov04, R.drawable.mov05, R.drawable.mov06,
+                R.drawable.mov07, R.drawable.mov08, R.drawable.mov09, R.drawable.mov10, R.drawable.mov11, R.drawable.mov12};
+        String[] posterName = {
+                "뺑반", "블랙팬서", "캡틴 아메리카 : 윈터 솔져", "내 머리속의 지우개", "러브레터", "말레피센트", "말아톤",
+                "괴물", "마더", "원데이", "예스터데이", "짱구는 못말려 : 어른 제국의 역습" };
+
+
+        public View getView(int position, View convertView, ViewGroup parent) { // 실제 영화 포스터의 개수만큼 반복된다고 생각하면 됨!(영화 포스터를 그리드뷰의 각 칸마다 보여줌)
+            ImageView imageView = new ImageView(context); // 이미지뷰 변수 생성
+            imageView.setLayoutParams(new GridView.LayoutParams(200, 300)); // 이미지뷰의 크기 200 * 300
+            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER); // 이미지뷰를 각 그리드뷰 칸의 중앙에 배치
+            imageView.setPadding(5, 5, 5, 5);
+
+            imageView.setImageResource(posterID[position]); // 넘어온 position 위치 적용
+
+            final int pos = position;
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    View dialogView = (View) View.inflate(MainActivity.this, R.layout.dialog, null); // dialog.xml 파일 인플레이트하여 dialogView에 대입
+                    AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this); // 대화상자 생성
+                    ImageView ivPoster = (ImageView) dialogView.findViewById(R.id.ivPoster); // dialog.xml의 이미지뷰에 접근
+                    ivPoster.setImageResource(posterID[pos]); // 이미지 변경
+                    dlg.setTitle(posterName[pos]); // 대화상자 제목 변경
+                    dlg.setIcon(R.drawable.picture); // 아이콘
+                    dlg.setView(dialogView);
+                    dlg.setNegativeButton("닫기", null); // 버튼은 닫기 버튼 하나만, 리스터 없음.
+                    dlg.show(); // 대화상자 보여주기
+                }
+            });
+            return imageView;
+        }
+    }
 
 }
